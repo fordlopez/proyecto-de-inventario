@@ -10,6 +10,7 @@ const getProductos = async (req, res, next) => {
     }
 };
 
+
 const getProductosId = async (req, res, next) => {
     try {
         const { id } = req.params;

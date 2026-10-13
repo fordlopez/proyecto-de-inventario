@@ -3,15 +3,19 @@ import express from "express";
 import { logger } from "./src/middleware/niddlewarelogger.js";
 import { errorHandler } from "./src/errorHander.js";
 import { pool } from "./src/configuraciones/database.js";
-import cors from "cors";
+import cors from "cors"
 import { inventarioRouter } from "./src/router/inventarioRouter.js";
 
 
 
 const app = express();
+
+
 app.use(cors({
-    origin: "http://localhost:5173"
-}));
+  origin:"http://localhost:5175" 
+}))
+
+
 app.use(express.json());
 app.use(logger);
 
