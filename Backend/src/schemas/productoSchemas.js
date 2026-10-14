@@ -27,7 +27,8 @@ const precioSchema = z.number()
 
 const stockSchema = z.number()
     .int("El stock debe ser un número entero")
-    .min(0, "El stock no puede ser negativo");
+    .min(0, "El stock no puede ser negativo")
+    .max(2147483647, "El stock supera el límite permitido");
 
 const camposEditables = {
     codigo: codigoSchema,
@@ -53,7 +54,7 @@ const idParamsSchema = z.object({
     id: z.string()
         .regex(/^[1-9]\d*$/, "El ID debe ser un entero positivo")
         .refine(
-            (valor) => Number.isSafeInteger(Number(valor)),
+            (v) => Number(v) <= 2147483647,
             "El ID está fuera del rango permitido"
         )
 });

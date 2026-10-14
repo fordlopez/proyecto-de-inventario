@@ -1,5 +1,5 @@
-
 import { useEffect, useState } from "react";
+import { obtenerErrores } from "../errors/obtenerErrores";
 
 const formularioInicial = {
     codigo: "",
@@ -15,7 +15,7 @@ const formularioInicial = {
 function ProductoFormulario({ producto, onGuardar }) {
     const [formulario, setFormulario] = useState(formularioInicial);
     const [guardando, setGuardando] = useState(false);
-    const [error, setError] = useState("");
+    const [errores, setErrores] = useState([]);
 
     useEffect(() => {
         if (producto) {
@@ -46,25 +46,21 @@ function ProductoFormulario({ producto, onGuardar }) {
     const manejarEnvio = async (e) => {
         e.preventDefault();
         setGuardando(true);
-        setError("");
+        setErrores([]);
 
         try {
             await onGuardar({
-                ...formulario,
                 codigo: formulario.codigo.trim(),
                 nombre: formulario.nombre.trim(),
+                descripcion: formulario.descripcion,
                 categoria: formulario.categoria.trim(),
                 marca: formulario.marca.trim(),
                 precio: Number(formulario.precio),
-                stock: Number(formulario.stock)
+                stock: Number(formulario.stock),
+                estado: Boolean(formulario.estado)
             });
         } catch (error) {
-            setError(
-                error.response?.data?.mensaje ||
-                error.message ||
-                "No se pudo guardar el producto"
-            );
-        } finally {
+            setErrores(obtenerErrores(error));
             setGuardando(false);
         }
     };
@@ -163,7 +159,13 @@ function ProductoFormulario({ producto, onGuardar }) {
                 Producto activo
             </label>
 
-            {error && <p role="alert">{error}</p>}
+            {errores.length > 0 && (
+                <ul role="alert">
+                    {errores.map((mensaje, indice) => (
+                        <li key={indice}>{mensaje}</li>
+                    ))}
+                </ul>
+            )}
 
             <button type="submit" disabled={guardando}>
                 {guardando ? "Guardando..." : "Guardar"}
@@ -172,4 +174,4 @@ function ProductoFormulario({ producto, onGuardar }) {
     );
 }
 
-export default ProductoFormulario;
+export { ProductoFormulario };

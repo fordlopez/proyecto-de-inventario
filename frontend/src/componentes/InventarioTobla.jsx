@@ -5,48 +5,51 @@ function InventarioTabla({ productos, onEditar, onEliminar }) {
     }
 
     return (
-        <table>
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Nombre</th>
-                    <th>Categoría</th>
-                    <th>Precio</th>
-                    <th>Stock</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {productos.map((producto) => (
-                    <tr key={producto.categoria_id}>
-                        <td>{producto.codigo}</td>
-                        <td>{producto.nombre}</td>
-                        <td>{producto.categoria}</td>
-                        <td>{Number(producto.precio).toFixed(2)}</td>
-                        <td>{producto.stock}</td>
-                        <td>
-                            {producto.estado ? "Activo" : "Inactivo"}
-                        </td>
-                        <td>
-                            <button
-                                onClick={() => onEditar(producto.categoria_id)}
-                            >
-                                Editar
-                            </button>
-
-                            <button
-                                onClick={() => onEliminar(producto)}
-                            >
-                                Eliminar
-                            </button>
-                        </td>
+        <div className="tabla-contenedor">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
                     </tr>
-                ))}
-            </tbody>
-        </table>
+                </thead>
+
+                <tbody>
+                    {productos.map((producto) => (
+                        <tr key={producto.id}>
+                            <td>{producto.codigo}</td>
+                            <td>{producto.nombre}</td>
+                            <td>{producto.categoria}</td>
+                            <td>Q{Number(producto.precio).toFixed(2)}</td>
+                            <td>{producto.stock}</td>
+                            <td>
+                                {producto.estado ? "Activo" : "Inactivo"}
+                            </td>
+                            <td>
+                                <button
+                                    onClick={() => onEditar(producto.id)}
+                                >
+                                    Editar
+                                </button>
+
+                                <button
+                                    className="boton-eliminar"
+                                    onClick={() => onEliminar(producto)}
+                                >
+                                    Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
     );
 }
 
-export default InventarioTabla;
+export { InventarioTabla };

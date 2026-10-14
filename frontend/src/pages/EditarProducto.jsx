@@ -1,38 +1,31 @@
-
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useInventario } from "../context/InventarioContext";
-import ProductoFormulario from "../components/ProductoFormulario";
+import { Link, useNavigate, useParams } from "react-router";
+import { ProductoFormulario } from "../componentes/ProductoFormulario";
+import { useInventario } from "../context/inventarioContext";
+import { obtenerErrores } from "../errors/obtenerErrores";
 
 function EditarProducto() {
     const { id } = useParams();
-
-    const {
-        obtenerProducto,
-        actualizarProducto
-    } = useInventario();
+    const { obtenerProducto, actualizarProducto } = useInventario();
+    const navigate = useNavigate();
 
     const [producto, setProducto] = useState(null);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState("");
 
-    const navigate = useNavigate();
-
     useEffect(() => {
+        setCargando(true);
+        setError("");
+
         obtenerProducto(id)
             .then(setProducto)
-            .catch((error) => {
-                setError(
-                    error.response?.data?.mensaje ||
-                    error.message
-                );
-            })
+            .catch((e) => setError(obtenerErrores(e).join(". ")))
             .finally(() => setCargando(false));
     }, [id]);
 
     const manejarGuardar = async (datos) => {
         await actualizarProducto(id, datos);
-        navigate("/");
+        navigate("/", { state: { mensaje: "Producto actualizado correctamente" } });
     };
 
     if (cargando) {
@@ -49,17 +42,19 @@ function EditarProducto() {
     }
 
     if (!producto) {
-        return <p>No se encontró el producto.</p>;
+        return (
+            <main>
+                <p>No se encontró el producto.</p>
+                <Link to="/">Volver al inventario</Link>
+            </main>
+        );
     }
 
     return (
         <main>
             <Link to="/">Volver al inventario</Link>
 
-            <ProductoFormulario
-                producto={producto}
-                onGuardar={manejarGuardar}
-            />
+            <ProductoFormulario producto={producto} onGuardar={manejarGuardar} />
         </main>
     );
 }

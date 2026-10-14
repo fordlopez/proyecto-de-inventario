@@ -1,50 +1,38 @@
-
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useInventario } from "../context/InventarioContext";
-import InventarioTabla from "../components/InventarioTabla";
+import { Link, useLocation, useNavigate } from "react-router";
+import { useInventario } from "../context/inventarioContext";
+import { obtenerErrores } from "../errors/obtenerErrores";
+import { InventarioTabla } from "../componentes/InventarioTobla";
+
 
 function Inventario() {
-    const {
-        productos,
-        listarProductos,
-        eliminarProducto
-    } = useInventario();
+    const { productos, listarProductos, eliminarProducto } = useInventario();
+
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState("");
-    const [mensaje, setMensaje] = useState("");
-    const navigate = useNavigate();
+    const [productoEliminar, setProductoEliminar] = useState(null);
+    const [mensaje, setMensaje] = useState(location.state?.mensaje ?? "");
 
     useEffect(() => {
         listarProductos()
-            .catch((error) => {
-                setError(
-                    error.response?.data?.mensaje ||
-                    error.message
-                );
-            })
+            .catch((e) => setError(obtenerErrores(e).join(". ")))
             .finally(() => setCargando(false));
     }, []);
 
-    const manejarEliminar = async (producto) => {
-        const confirmar = window.confirm(
-            `¿Quieres eliminar ${producto.nombre}?`
-        );
-
-        if (!confirmar) return;
-
+    const manejarEliminar = async () => {
         setError("");
         setMensaje("");
 
         try {
-            await eliminarProducto(producto.categoria_id);
+            await eliminarProducto(productoEliminar.id);
             setMensaje("Producto eliminado correctamente");
-        } catch (error) {
-            setError(
-                error.response?.data?.mensaje ||
-                error.message
-            );
+            setProductoEliminar(null);
+        } catch (e) {
+            setError(obtenerErrores(e).join(". "));
+            setProductoEliminar(null);
         }
     };
 
@@ -52,9 +40,9 @@ function Inventario() {
         <main>
             <h1>Sistema de inventario</h1>
 
-            <Link to="/crear">Registrar producto</Link>
+            <Link to="/crear">Nuevo producto</Link>
 
-            {mensaje && <p>{mensaje}</p>}
+            {mensaje && <p role="status">{mensaje}</p>}
             {error && <p role="alert">{error}</p>}
 
             {cargando ? (
@@ -63,8 +51,35 @@ function Inventario() {
                 <InventarioTabla
                     productos={productos}
                     onEditar={(id) => navigate(`/editar/${id}`)}
-                    onEliminar={manejarEliminar}
+                    onEliminar={(producto) => setProductoEliminar(producto)}
                 />
+            )}
+            {productoEliminar && (
+                <div className="confirmacion-fondo">
+                    <div className="confirmacion-caja">
+                        <h2>¿Eliminar producto?</h2>
+
+                        <p>
+                            ¿Quieres eliminar <strong>{productoEliminar.nombre}</strong>?
+                        </p>
+
+                        <div className="confirmacion-botones">
+                            <button
+                                className="boton-cancelar"
+                                onClick={() => setProductoEliminar(null)}
+                            >
+                                Cancelar
+                            </button>
+
+                            <button
+                                className="boton-eliminar"
+                                onClick={manejarEliminar}
+                            >
+                                Sí, eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </main>
     );

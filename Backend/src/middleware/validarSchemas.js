@@ -1,4 +1,3 @@
-
 const validarSchema = (schema, origen = "body") => {
     return (req, res, next) => {
         const resultado = schema.safeParse(req[origen]);
@@ -6,14 +5,25 @@ const validarSchema = (schema, origen = "body") => {
         if (!resultado.success) {
             return res.status(400).json({
                 mensaje: "Error de validación",
-                errores: resultado.error.issues.map((error) => ({
-                    campo: error.path.join("."),
-                    mensaje: error.message
+                errores: resultado.error.issues.map((issue) => ({
+                    campo: issue.path.join("."),
+                    mensaje: issue.message
                 }))
             });
         }
 
-        req[origen] = resultado.data;
+
+        if (origen === "body") {
+            req.body = resultado.data;
+        } else {
+            Object.defineProperty(req, origen, {
+                value: resultado.data,
+                writable: true,
+                configurable: true,
+                enumerable: true
+            });
+        }
+
         next();
     };
 };

@@ -1,7 +1,6 @@
-
-import { Link, useNavigate } from "react-router-dom";
-import { useInventario } from "../context/InventarioContext";
-import ProductoFormulario from "../components/ProductoFormulario";
+import { Link, useNavigate } from "react-router";
+import { ProductoFormulario } from "../componentes/ProductoFormulario";
+import { useInventario } from "../context/inventarioContext";
 
 function CrearProducto() {
     const { crearProducto } = useInventario();
@@ -9,18 +8,16 @@ function CrearProducto() {
 
     const manejarGuardar = async (datos) => {
         await crearProducto(datos);
-        navigate("/");
+        navigate("/", { state: { mensaje: "Producto creado correctamente" } });
     };
 
     return (
         <main>
             <Link to="/">Volver al inventario</Link>
 
-            <ProductoFormulario
-                onGuardar={manejarGuardar}
-            />
+            <ProductoFormulario onGuardar={manejarGuardar} />
         </main>
     );
 }
 
-export default CrearProducto;
+export { CrearProducto };

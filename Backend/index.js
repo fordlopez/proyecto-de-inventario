@@ -1,39 +1,37 @@
 import "dotenv/config";
 import express from "express";
-import { logger } from "./src/middleware/niddlewarelogger.js";
-import { errorHandler } from "./src/errorHander.js";
+import cors from "cors";
+import { logger } from "./src/middleware/loggerMiddleware.js";
+import { errorHandler, rutaNoEncontrada } from "./src/middleware/errorHandler.js";
 import { pool } from "./src/configuraciones/database.js";
-import cors from "cors"
-import { inventarioRouter } from "./src/router/inventarioRouter.js";
-
-
+import { productosRouter } from "./src/router/productosRouter.js";
 
 const app = express();
 
-
 app.use(cors({
-  origin:"http://localhost:5175" 
-}))
-
+    origin: process.env.FRONTEND_URL || "http://localhost:5173"
+}));
 
 app.use(express.json());
 app.use(logger);
 
-app.use("/api/inventario", inventarioRouter);
+app.use("/api/productos", productosRouter);
 
+// Después de las rutas: 404 para rutas desconocidas y manejador central de errores
+app.use(rutaNoEncontrada);
 app.use(errorHandler);
-
 
 const PORT = process.env.PORT || 9000;
 
 try {
-    await pool.query("select 1");
+    await pool.query("SELECT 1");
     console.log("PostgreSQL conectado");
 
     app.listen(PORT, () => {
         console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
     });
 } catch (error) {
-    console.log("error al conectar", error.message);
+    console.error("Error al conectar con PostgreSQL:", error.message);
     await pool.end();
+    process.exit(1);
 }

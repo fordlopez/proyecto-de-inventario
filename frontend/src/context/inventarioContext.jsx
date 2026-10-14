@@ -1,11 +1,9 @@
-
 import { createContext, useContext, useState } from "react";
 import inventarioApi from "../api";
-inventarioApi
 
-const InventarioContext = createContext();
+const InventarioContext = createContext(null);
 
-export function InventarioProvider({ children }) {
+function InventarioProvider({ children }) {
     const [productos, setProductos] = useState([]);
 
     const listarProductos = async () => {
@@ -17,9 +15,7 @@ export function InventarioProvider({ children }) {
 
     const obtenerProducto = async (id) => {
         const respuesta = await inventarioApi.get(`/${id}`);
-        const datos = respuesta.data?.data ?? respuesta.data;
-
-        const producto = Array.isArray(datos) ? datos[0] : datos;
+        const producto = respuesta.data?.data ?? respuesta.data;
 
         if (!producto) {
             throw new Error(`No existe un producto con el ID ${id}`);
@@ -41,10 +37,9 @@ export function InventarioProvider({ children }) {
     const eliminarProducto = async (id) => {
         await inventarioApi.delete(`/${id}`);
 
+        // Actualiza la lista sin recargar la página
         setProductos((anteriores) =>
-            anteriores.filter(
-                (producto) => producto.categoria_id !== Number(id)
-            )
+            anteriores.filter((producto) => producto.id !== Number(id))
         );
     };
 
@@ -64,6 +59,14 @@ export function InventarioProvider({ children }) {
     );
 }
 
-export function useInventario() {
-    return useContext(InventarioContext);
-}
+const useInventario = () => {
+    const contexto = useContext(InventarioContext);
+
+    if (!contexto) {
+        throw new Error("useInventario debe usarse dentro de InventarioProvider");
+    }
+
+    return contexto;
+};
+
+export { InventarioProvider, InventarioContext, useInventario };
