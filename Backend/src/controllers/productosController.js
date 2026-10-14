@@ -1,11 +1,10 @@
-import {
-    actualizarProducto,
-    crearProducto,
+import { actualizarProducto,crearProducto,
     eliminarProducto,
     listarProductos,
-    obtenerProductoPorId
-} from "../repositories/productosRepository.js";
+    obtenerProductoPorId } from "../Repositories/productosRepository.js";
 
+
+actualizarProducto
 const getProductos = async (req, res, next) => {
     try {
         const productos = await listarProductos();

@@ -1,6 +1,5 @@
 import { pool } from "../configuraciones/database.js";
 
-
 const listarProductos = async () => {
     const result = await pool.query("SELECT * FROM productos ORDER BY id");
     return result.rows;

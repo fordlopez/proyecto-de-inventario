@@ -37,7 +37,6 @@ function InventarioProvider({ children }) {
     const eliminarProducto = async (id) => {
         await inventarioApi.delete(`/${id}`);
 
-        // Actualiza la lista sin recargar la página
         setProductos((anteriores) =>
             anteriores.filter((producto) => producto.id !== Number(id))
         );

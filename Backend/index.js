@@ -9,7 +9,7 @@ import { productosRouter } from "./src/router/productosRouter.js";
 const app = express();
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173"
+    origin: process.env.FRONTEND_URL || "http://localhost:5174"
 }));
 
 app.use(express.json());
@@ -17,7 +17,6 @@ app.use(logger);
 
 app.use("/api/productos", productosRouter);
 
-// Después de las rutas: 404 para rutas desconocidas y manejador central de errores
 app.use(rutaNoEncontrada);
 app.use(errorHandler);
 
